@@ -86,24 +86,16 @@ bck=adam@10.248.179.22
 
 #if [[ $backend == *"64 bytes from 192.168.129.136:"* ]]; then
 #        echo "SSH into server"
-#        check=$(systemctl --host $bck status rabbitmq-server.service)
+#        check=$(systemctl --host $rbmq status rabbitmq-server.service)
 #        if [[ $check == *"active (running)"* ]]; then
 #               echo "Service is running"
-#		echo launching listener
-#		cd /
-
-#        else
-#                echo "Starting services.."
-#Change IP	 ssh-copy-id adam@10.248.179.22
-#                sudo systemctl --host $bck start rabbitmq-server.service
-#                check=$(systemctl --host $bck status rabbitmq-server.service)
-#                if [[ $check == *"active (running)"* ]]; then
-#                        echo "Service is running"
-#                        echo $check
-#                fi
+#		            echo "launching listener"
+#		            cd /home/adam/Documents/Scripts
+#               ./reciever.py
+#
 #        fi
 #else
 #        echo "server is down"
-
+#
 #fi
 
