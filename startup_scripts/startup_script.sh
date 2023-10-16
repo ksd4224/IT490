@@ -19,7 +19,7 @@ bck_IP=10.248.179.22
 #		echo "Service is running"
 #
 #	else
-#		#ssh-copy-id $rbmq
+#		ssh-copy-id $rbmq
 #		echo "Starting services.."
 #		ssh $rbmq sudo service rabbitmq-server start
 #		check=$(systemctl --host $rbmq status rabbitmq-server.service)
@@ -38,14 +38,14 @@ bck_IP=10.248.179.22
 #
 #if [[ $Apache == *"64 bytes from $apc_IP:"* ]]; then
 #        echo "SSH into server"
-#change user and IP        check=$(systemctl --host $apc status apache2)
+#        check=$(systemctl --host $apc status apache2)
 #        if [[ $check == *"active (running)"* ]]; then
 #                echo "Service is running."
 #
 #        else
 #                echo "Starting services.."
-#		 ssh-copy-id $apc
-#		 ssh $apc sudo service apache2 start
+#		             ssh-copy-id $apc
+#		             ssh $apc sudo service apache2 start
 #                check=$(systemctl --host $apc status apache2)
 #                if [[ $check == *"active (running)"* ]]; then
 #                        echo "Service is running."
@@ -70,7 +70,7 @@ bck_IP=10.248.179.22
 
 #        else
 #                echo "Starting services.."
-#change IP	 ssh-copy-id $dbs
+#              	 ssh-copy-id $dbs
 #                ssh $dbs sudo service mysql.service start
 #                check=$(systemctl --host $dbs status mysql.service)
 #                if [[ $check == *"active (running)"* ]]; then
