@@ -1,0 +1,30 @@
+.welcome{
+        background-color: #008080;
+        text-align: center;
+        font-family: "Times New Roman", "Georgia";
+        color: black;
+        font-style: oblique;
+        padding-top: 0%;
+        padding-left: 0%;
+        padding-right: 0%;
+        padding-bottom: 1px;
+        font-size: 40px;
+}
+
+.mantra{
+        font-size: 20px;
+        font-family: sans-serif;
+        font-style: normal;
+}
+
+.img1{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+        float: right;
+}
+
+.register{
+        text-align: center;
+}
