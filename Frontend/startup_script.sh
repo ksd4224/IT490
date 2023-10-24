@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ##Change the IP's here the rest of the script will adjust appropriately##
-rbmq=nikitas@10.248.179.18
-rbmq_IP=10.248.179.18
-apc=ksd42@10.248.179.22
-apc_IP=10.248.179.22
-dbs=rp54@10.248.179.10
-dbs_IP=10.248.179.10
-bck=adam@10.248.179.6
-bck_IP=10.248.179.6
+rbmq=nikitas@10.248.179.14
+rbmq_IP=10.248.179.14
+apc=ksd42@10.248.179.18
+apc_IP=10.248.179.18
+dbs=rp54@10.248.179.6
+dbs_IP=10.248.179.6
+bck=adam@10.248.179.22
+bck_IP=10.248.179.22
 ################################## RabbitMQ ################################################
 rabbitmq=$(ping -c 2 $rbmq_IP)
 
