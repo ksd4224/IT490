@@ -1,4 +1,4 @@
-hp
+<?php
         session_start();
         $_SESSION['first'] = $_POST['first'];
         $_SESSION['last'] = $_POST['last'];
