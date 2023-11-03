@@ -1,0 +1,64 @@
+<?php
+	session_start();
+	$_SESSION['email'] = $_POST['email'];
+        $_SESSION['psw'] = $_POST['psw'];
+        $email = $_SESSION['email'];
+	$psw = $_SESSION['psw'];
+?>
+<html>
+        <head>
+                <title> ShapeShift </title>
+                <link rel="stylesheet" href="index.css" />
+	</head>
+
+        <body style="color:#008080;" >
+                <h1 class="welcome">
+                        <img class="img1" src="logo.png">
+                        LOGIN TO SHAPESHIFT <br>
+                        <p class="mantra">SHIFT YOUR HEALTH, SHAPE YOUR FUTURE</p>
+                        <h1 class="register"> LOGIN </h1>
+                  </h1>
+		  <form action="landing.php" method="post">
+			<label for="email"><b>Email</b></label>
+                	<input type="text" placeholder="Enter Email" name="email" id="email" required>
+                	<br><br>
+                	<label for="psw"><b>Password</b></label>
+                	<input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+                	<br><br>
+                	<button type="submit" class="registerbtn" onclick="Sendlogin($email, $psw)" >Login</button>
+        	</form>
+	<body>
+</html>
+
+<script>
+	function sendlogin($email, $psw){
+		const registrationData = {
+  			name: "John Doe",
+  			email: "john.doe@example.com",
+  			password: "secure_password"
+		};
+
+		fetch("https://your-backend-api.com/register", {
+  			method: "POST",
+ 			headers: {
+    			"Content-Type": "application/json",
+  			},
+  			body: JSON.stringify(registrationData),
+		})
+  		.then((response) => {
+    		if (response.ok) {
+      			// Registration was successful
+      			return response.json();
+    		} else {
+      		// Handle registration errors
+      			throw new Error("Registration failed");
+    		}
+  		})
+  		.then((data) => {
+    			alert("success");
+  		})
+  		.catch((error) => {
+    			alert("not successful");
+		});
+}
+</script>
