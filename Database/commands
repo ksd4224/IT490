@@ -1,0 +1,13 @@
+Stop service - systemctl stop mysql
+Start database - sudo ./database.sh
+see status of service - systemctl status mysql
+Start write/read to messaging - python3 write.py
+Turn on VPN - sudo openvpn Firewalla.ovpn
+
+mysql:
+
+SHOW DATABASES - list databses
+USE "name of database" - select the database
+SHOW tables - list tables in database
+SELECT * FROM "name of table" - list data in table
+DESCRIBE "table name" - show all coloumns in table
