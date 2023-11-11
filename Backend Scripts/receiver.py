@@ -19,7 +19,7 @@ try:
 
 except Exception as e:
     print("Some modules are missing {}".format(e))
-    
+    sys.exit(1)
 
 from users.models import CustomUser
 from users.utils import save_user_info
@@ -36,14 +36,7 @@ def callback(ch, method, properties, body):
     email = data.get('email')
     password = data.get('psw')
     print("Received data:", data)
-    
-    if not first_name or not last_name or not email or not password:
-        print("Improper input: All fields must be provided.")
-        return
-
     save_user_info(first_name, last_name, email, password)
-
-
 
 channel.basic_consume(
         queue='front-back', on_message_callback=callback, auto_ack=True)
