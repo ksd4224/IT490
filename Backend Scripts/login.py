@@ -6,11 +6,11 @@ import pika
 import sys
 import json
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'IT490.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Project490.settings')
 credentials = pika.PlainCredentials('backend','password')
 parameters = pika.ConnectionParameters(
-    host='10.248.179.10', 
-    port=5672, 
+    host='10.248.179.10',
+    port=5672,
     credentials = credentials
  )
 
@@ -19,11 +19,11 @@ try:
 
 except Exception as e:
     print("Some modules are missing {}".format(e))
- 
 
-from users.models import CustomUser
-from users.utils import save_user_info
-from django.contrib.auth import authenticate
+#from users.models import CustomUser
+#from users.utils import save_user_info
+#from django.contrib.auth import authenticate
+from users.utils import authenticate_user
 
 connection = pika.BlockingConnection(parameters)
 
@@ -33,7 +33,7 @@ channel.queue_declare(queue='login', durable=True)
 def callback(ch, method, properties, body):
     data = json.loads(body.decode('utf-8'))
     email = data.get('email')
-    psw = data.get('psw')
+    password = data.get('password')
 
     print("Received data:", data)
 
@@ -44,18 +44,18 @@ def callback(ch, method, properties, body):
     if '@' not in email:
         print("Improper Input: Invalid email format.")
         return
+    try:
+        user = authenticate_user(email=email, password=password)
 
-    user = authenticate(email=email, psw=psw)
+        if user is not None:
+            print("User successfully logged in.")
+        else:
+            print("User account doesn't exist or incorrect credentials.")
+    except Exception as e:
+        print(f"Error during authentication: {e}")
 
-    if user is not None:
-        print("User successfully logged in.")
-    else:
-        print("User account doesn't exist or incorrect credentials.")
-
-
-
-channel.basic_consume(
-        queue='login', on_message_callback=callback, auto_ack=True)
+channel.basic_consume(queue='login', on_message_callback=callback, auto_ack=True)
 
 print(' [*] Waiting for messages. To exit press CTRL+C')
 channel.start_consuming()
+
