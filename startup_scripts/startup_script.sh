@@ -8,23 +8,23 @@ secondary_apc=nikitas@10.248.179.11
 secondary_apc_IP=10.248.179.11
 
 #keyas section
-primary_apc=keya@10.248.179.10
-primary_apc_IP=10.248.179.10
-secondary_rbmq=keya@10.248.179.10
-secondary_rbmq_IP=10.248.179.10
+primary_apc=keya@10.248.179.6
+primary_apc_IP=10.248.179.6
+secondary_rbmq=keya@10.248.179.6
+secondary_rbmq_IP=10.248.179.6
 
 #Ritiks section
-priamry_dbs=rp54@10.248.179.14
-primary_dbs_IP=10.248.179.14
-tertiary_rbmq=rp54@10.248.178.14
-tertiary_rbmq_IP=10.248.179.14
+primary_dbs=rp54@10.248.179.10
+primary_dbs_IP=10.248.179.10
+tertiary_rbmq=rp54@10.248.178.10
+tertiary_rbmq_IP=10.248.179.10
 
 
 #adams section
-bck=adam@10.248.179.6
-bck_IP=10.248.179.6
-secondary_dbs=adam@10.248.179.6
-secondary_dbs=10.248.179.6
+bck=adam@10.248.179.18
+bck_IP=10.248.179.18
+secondary_dbs=adam@10.248.179.18
+secondary_dbs=10.248.179.18
 
 
 ################################## Primary_RabbitMQ ################################################
@@ -128,49 +128,54 @@ elif [[ $secondary_Apache == *"64 bytes from $secondary_apc_IP:"* ]]; then
         fi
 
 else
-        echo "No Apache servers running at this time. What are the odds\!?..... 2 .. the odds are 2 out of 2."
+    echo "No Apache servers running at this time. What are the odds\!?..... 2 .. the odds are 2 out of 2."
 
 fi
 
 
 
 ################################## Database ################################################
+echo "Pinging Primary Database"
 primary_Database=$(ping -c 2 $primary_dbs_IP )
+echo $primary_Database
+
+echo Pinging secondary Database
 secondary_Database=$(ping -c 2 $secondary_dbs_IP)
+echo $secondary_Database
+
 
 if [[ $primary_Database == *"64 bytes from $primary_dbs_IP:"* ]]; then
     echo "SSH into server Database primary"
-    check=$(systemctl --host $primary_dbs status mysql.service)
+    check=$(ssh $primary_dbs sudo service mysql status)
     if [[ $check == *"active (running)"* ]]; then
         echo "Service is running on primary database."
     else
         echo "Starting service on primary database."
-        ssh $primary_dbs
-        sudo service mysql start
-        check=$(systemctl --host $primary_dbs status mysql.service)
+        ssh $primary_dbs service mysql start
+        check=$(ssh $primary_dbs sudo service mysql status)
         if [[ $check == *"active (running)"* ]]; then
             echo "Service is running on priamry database."
             echo $check
         fi
     fi
 
-elif [[ $secondary_Database == *"64 bytes from $secondary_dbs_IP:"* ]]; then
-    echo "SSH into server Database on secondary"
-    check=$(systemctl --host $secondary_dbs status mysql)
-    if [[ $check == *"active (running)"* ]]; then
-        echo "Service is running on secondary database."
-    else
-        echo "Starting services on secondary database"
-        ssh $secondary_dbs sudo service mysql start
-        check=$(systemctl --host $secondary_dbs status mysql)
-        if [[ $check == *"active (running)"* ]]; then
-            echo "Service is running on secondary database."
+ elif [[ $secondary_Database == *"64 bytes from $secondary_dbs_IP:"* ]]; then
+     echo "SSH into server Database on secondary"
+     check=$(systemctl --host $secondary_dbs status mysql)
+     if [[ $check == *"active (running)"* ]]; then
+         echo "Service is running on secondary database."
+     else
+         echo "Starting services on secondary database"
+         ssh $secondary_dbs sudo service mysql start
+         check=$(systemctl --host $secondary_dbs status mysql)
+         if [[ $check == *"active (running)"* ]]; then
+             echo "Service is running on secondary database."
             echo $check
-        fi
-    fi
+         fi
+     fi
 
 else
-        echo "No Database servers running at this time. What are the odds\!?..... 2 .. the odds are 2 out of 2."
+    echo "No Database servers running at this time. What are the odds\!?..... 2 .. the odds are 2 out of 2."
 
 fi
 
