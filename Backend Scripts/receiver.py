@@ -5,11 +5,12 @@ import django
 import pika
 import sys
 import json
+from django.db import OperationalError
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Project490.settings')
 credentials = pika.PlainCredentials('backend','password')
 parameters = pika.ConnectionParameters(
-    host='10.248.179.6',
+    host='10.248.179.10',
     port=5672,
     credentials = credentials
  )
@@ -49,7 +50,7 @@ def callback(ch, method, properties, body):
             save_user_info(first_name, last_name, email, password)
         
             bd_channel.basic_publish(
-                exchange='backend=database',
+                exchange='backend-database',
                 routing_key='database',
                 body=json.dumps(data),
                 properties=pika.BasicProperties(
@@ -73,6 +74,8 @@ except KeyboardInterrupt:
     print(' [*] Exiting due to user interruption')
 except Exception as e:
     print(f"Error during message consumption: {e}")
-
+finally:
+    bd_rbqm.close()
+    connection.close()
 
 
