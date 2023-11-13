@@ -9,7 +9,7 @@ import json
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Project490.settings')
 credentials = pika.PlainCredentials('backend','password')
 parameters = pika.ConnectionParameters(
-    host='10.248.179.10',
+    host='10.248.179.6',
     port=5672,
     credentials = credentials
  )
@@ -28,6 +28,13 @@ connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 channel.queue_declare(queue='front-back', durable=True)
 
+
+#publishing rabbitmq data to database
+bd_rbqm = pika.BlockingConnection(parameters)
+bd_channel = bd_rbqm.channel()
+bd_channel.queue_declare(queue='back-data', durable=True)
+
+
 def callback(ch, method, properties, body):
     data = json.loads(body.decode('utf-8'))
     print("Received data:", data)
@@ -37,10 +44,24 @@ def callback(ch, method, properties, body):
         email = data.get('email')
         password = data.get('password')
         print("Processing data:", first_name, last_name, email)
-        save_user_info(first_name, last_name, email, password)
+
+        try:
+            save_user_info(first_name, last_name, email, password)
+        
+            bd_channel.basic_publish(
+                exchange='backend=database',
+                routing_key='database',
+                body=json.dumps(data),
+                properties=pika.BasicProperties(
+                     delivery_mode=2,
+                )
+            )
+            print("User data sent to RabbitMQ:", data)
+        except (OperationalError, DatabaseError) as e:
+            print(f"Error connecting to the default database: {e}")
+       
     except KeyError as e:
         print(f"Error processing message: {e}")
-
 
 channel.basic_consume(
         queue='front-back', on_message_callback=callback, auto_ack=True)
