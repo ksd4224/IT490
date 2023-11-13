@@ -3,7 +3,7 @@
         $_SESSION['first'] = $_POST['first'];
         $_SESSION['last'] = $_POST['last'];
         $_SESSION['email'] = $_POST['email'];
-        $_SESSION['psw'] = $_POST['psw'];
+        $_SESSION['password'] = $_POST['password'];
         $email = $_SESSION['email'];
         include 'write.php';
 ?>
@@ -24,8 +24,8 @@
         <label for="email"><b>Email</b></label>
         <input type="text" placeholder="Enter Email" name="email" id="email" required>
         <br><br>
-        <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="password" id="password" required>
         <br><br>
         <button type="submit" class="registerbtn">Login</button>
     </form>
