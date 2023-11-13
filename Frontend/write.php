@@ -4,9 +4,9 @@ require 'vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-if (isset($_SESSION['email']) && isset($_SESSION['psw']) && isset($_SESSION['first']) && isset($_SESSION['last'])) {
+if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION['first']) && isset($_SESSION['last'])) {
     $email = $_SESSION['email'];
-    $psw = $_SESSION['psw'];
+    $password = $_SESSION['password'];
     $first = $_SESSION['first'];
     $last = $_SESSION['last'];
 
@@ -16,7 +16,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw']) && isset($_SESSION['fir
     $rabbitMQPassword = 'password';
     $virtualHost = '/';
     $exchangeName = 'frontend-backend'; // Replace with your exchange name
-    echo $first . " " . $last . " " . $email . " " . $psw;
+    echo $first . " " . $last . " " . $email . " " . $password;
     try {
         // Create a connection to RabbitMQ
         $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
@@ -28,15 +28,15 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw']) && isset($_SESSION['fir
         $channel->exchange_declare($exchangeName, 'direct', false, true, false);
 
         // Create a message
-	$messageBody = json_encode([
-	    'first' => $first,
-	    'last' => $last,
+        $messageBody = json_encode([
+            'first' => $first,
+            'last' => $last,
             'email' => $email,
-            'psw' => $psw
+            'password' => $password
         ]);
 
-	// Specify the routing key for the backend queue
-	$routingKey = 'frontend';
+        // Specify the routing key for the backend queue
+        $routingKey = 'frontend';
 
         // Publish the message to the exchange with the routing key
         $message = new AMQPMessage($messageBody);
@@ -48,7 +48,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw']) && isset($_SESSION['fir
 
         // Clear the session variables
         unset($_SESSION['email']);
-        unset($_SESSION['psw']);
+        unset($_SESSION['password']);
 
         echo "Message sent to the exchange with routing key '$routingKey': $messageBody\n";
     } catch (\Exception $e) {
@@ -58,4 +58,3 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw']) && isset($_SESSION['fir
     echo "Registration did not succeed.";
 }
 ?>
-
