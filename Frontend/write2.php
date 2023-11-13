@@ -4,9 +4,9 @@ require 'vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-if (isset($_SESSION['email']) && isset($_SESSION['psw'])) {
+if (isset($_SESSION['email']) && isset($_SESSION['password'])) {
     $email = $_SESSION['email'];
-    $psw = $_SESSION['psw'];
+    $password = $_SESSION['password'];
 
     //require 'vendor/autoload.php';
     //use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -18,7 +18,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw'])) {
     $rabbitMQPassword = 'password';
     $virtualHost = '/';
     $exchangeName = 'frontend-backend'; // Replace with your exchange name
-    echo $email . " " . $psw;
+    echo $email . " " . $password;
     try {
         // Create a connection to RabbitMQ
         $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
@@ -32,11 +32,11 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw'])) {
         // Create a message
         $messageBody = json_encode([
             'email' => $email,
-            'psw' => $psw
+            'password' => $password
         ]);
 
         // Specify the routing key for the backend queue
-        $routingKey = 'frontend';
+        $routingKey = 'login';
 
         // Publish the message to the exchange with the routing key
         $message = new AMQPMessage($messageBody);
@@ -48,7 +48,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['psw'])) {
 
         // Clear the session variables
         unset($_SESSION['email']);
-        unset($_SESSION['psw']);
+        unset($_SESSION['password']);
 
         echo "Message sent to the exchange with routing key '$routingKey': $messageBody\n";
     } catch (\Exception $e) {
