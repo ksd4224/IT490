@@ -5,7 +5,7 @@ import django
 import pika
 import sys
 import json
-from django.db import OperationalError
+from django.db import OperationalError, DatabaseError
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Project490.settings')
 credentials = pika.PlainCredentials('backend','password')
