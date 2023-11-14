@@ -73,7 +73,8 @@ WSGI_APPLICATION = 'Project490.wsgi.application'
 #Users application settings
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+     'users.auth_backends.PlainTextPasswordBackend',
+#    'django.contrib.auth.backends.ModelBackend',
 ]
 
 LOGIN_REDIRECT_URL = '/'

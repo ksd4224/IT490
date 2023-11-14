@@ -6,6 +6,12 @@ from django.contrib.auth import authenticate
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128, null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        if self.password:
+            self.password = self.password
+        super().save(*args,**kwargs)
 
     def __str__(self):
         return self.email

@@ -20,10 +20,7 @@ try:
 except Exception as e:
     print("Some modules are missing {}".format(e))
 
-#from users.models import CustomUser
-#from users.utils import save_user_info
-#from django.contrib.auth import authenticate
-from users.utils import authenticate_user
+from users.utils import authenticate
 
 connection = pika.BlockingConnection(parameters)
 
@@ -45,7 +42,7 @@ def callback(ch, method, properties, body):
         print("Improper Input: Invalid email format.")
         return
     try:
-        user = authenticate_user(email=email, password=password)
+        user = authenticate(email=email, password=password)
 
         if user is not None:
             print("User successfully logged in.")

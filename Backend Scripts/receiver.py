@@ -74,8 +74,10 @@ except KeyboardInterrupt:
     print(' [*] Exiting due to user interruption')
 except Exception as e:
     print(f"Error during message consumption: {e}")
-finally:
-    bd_rbqm.close()
-    connection.close()
+#finally:
+#    if bd_rbqm.is_open:
+#        bd_rbqm.close()
+#    if connection.is_open:
+#        connection.close()
 
 
