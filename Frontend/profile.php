@@ -1,7 +1,7 @@
 <?php
         session_start();
-        $_SESSION['email'] = $_POST['email'];
-        $_SESSION['password'] = $_POST['password'];
+        //$_SESSION['email'] = $_POST['email'];
+        //$_SESSION['password'] = $_POST['password'];
         $email = $_SESSION['email'];
         echo "hi, " . $email;
         //include 'write2.php';
@@ -64,7 +64,7 @@
                                         <tr>
                                                 <td style="width: 150px;">Name</td>
                                                 <td>:</td>
-                                                <td>ImDezCode</td>
+                                                <td>Test</td>
                                         </tr>
                                         <tr>
                                                 <td>Email Address</td>
@@ -72,14 +72,14 @@
                                                 <td><?php echo $email ?> </td>
                                         </tr>
                                         <tr>
-                                                <td>Address</td>
+                                                <td>Height</td>
                                                 <td>:</td>
-                                                <td>Bali, Indonesia</td>
+                                                <td>5ft 6in</td>
                                         </tr>
                                         <tr>
-                                                <td>Job</td>
+                                                <td>Weight</td>
                                                 <td>:</td>
-                                                <td>Web Developer</td>
+                                                <td>140 lbs </td>
                                         </tr>
                                 </tbody>
                         </table>
@@ -88,4 +88,3 @@
                 </div>
         </body>
 </html>
-          
