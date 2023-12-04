@@ -4,7 +4,6 @@ CREATE TABLE users (user_id INT PRIMARY KEY AUTO_INCREMENT, email VARCHAR(255) N
 
 #Table for meals
 
-
 CREATE TABLE meals (meal_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, meal_name VARCHAR(255) NOT NULL, meal_datetime TIMESTAMP NOT NULL, FOREIGN KEY (user_id) REFERENCES users(user_id));
 
 #Table for nutrition data
@@ -13,12 +12,13 @@ CREATE TABLE nutrition_data (data_id INT PRIMARY KEY AUTO_INCREMENT, meal_id INT
 
 #Table for workouts
 
-CREATE TABLE workout (workout_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, workout_name VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE);
+CREATE TABLE workout (workout_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, workout_name VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE);
+
 
 #Table for posts
 
-CREATE TABLE posts ( post_id INT PRIMARY KEY AUTO_INCREMENT, First_name VARCHAR(255), User_id INT, post_content TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE);
+CREATE TABLE posts (post_id INT PRIMARY KEY AUTO_INCREMENT, First_name VARCHAR(255), User_id INT, post_content TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (User_id) REFERENCES users(user_id) ON DELETE CASCADE);
 
 #Table for weight
 
-CREATE TABLE weight_tracking (tracking_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, weight INT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE);
+CREATE TABLE weight_tracking (tracking_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT weight INT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE);
