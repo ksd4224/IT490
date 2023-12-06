@@ -1,10 +1,9 @@
 import pika
 import mysql.connector
 import json
-import time
 
 # Set your RabbitMQ server connection parameters
-rabbitmq_host = '10.147.17.34'  # Change this to your RabbitMQ server's hostname or IP
+rabbitmq_host = '10.248.179.10'  # Change this to your RabbitMQ server's hostname or IP
 rabbitmq_port = 5672          # Change this to your RabbitMQ server's port
 
 rabbitmq_params = pika.ConnectionParameters(
@@ -14,14 +13,7 @@ rabbitmq_params = pika.ConnectionParameters(
 )
 
 # Establish a connection to RabbitMQ server
-while True:
-    try:
-        connection = pika.BlockingConnection(rabbitmq_params)
-        break
-    except Exception as e:
-        print(f"Connection to RabbitMQ failed. Retrying in 5 seconds... ({e})")
-        time.sleep(5)
-
+connection = pika.BlockingConnection(rabbitmq_params)
 channel = connection.channel()
 
 # Declare the queue you want to consume from
@@ -29,7 +21,7 @@ queue_name = 'back-data'
 channel.queue_declare(queue=queue_name, durable=True)
 
 # Set up the MySQL database connection parameters
-db_host = '10.147.17.44'
+db_host = '0.0.0.0'
 db_port = 3306  # Change this to your database port
 db_user = 'rp54'
 db_password = 'Patel@123'
@@ -48,6 +40,7 @@ db_connection = mysql.connector.connect(
 cursor = db_connection.cursor()
 
 # Callback function to handle incoming messages
+
 def callback(ch, method, properties, body):
     try:
         message = body.decode()
@@ -57,30 +50,13 @@ def callback(ch, method, properties, body):
         data = json.loads(message)
         print("Parsed JSON:", data)
 
-        # Check if the user already exists in the database
-        check_sql = "SELECT * FROM users WHERE email = %s"
-        cursor.execute(check_sql, (data['email'],))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            print("User already exists in the database.")
-        else:
-            # User doesn't exist, insert data into the MySQL database
-            insert_sql = "INSERT INTO users (email, password, weight, height, goal, first_name, last_name) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            values = (
-                data['email'],
-                data['password'],
-                data['weight'],
-                data['height'],
-                data.get('goal', None),
-                data['first_name'],
-                data['last_name']
-            )
-            cursor.execute(insert_sql, values)
-            db_connection.commit()
-            print("Data written to the 'users' table.")
-
-        # ... (rest of the code)
+        # Now, you can insert data into your MySQL database
+        # Example: Inserting data into a 'users' table
+        sql = "INSERT INTO user (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)"
+        values = (data['first'], data['last'], data['email'], data['password'])
+        cursor.execute(sql, values)
+        db_connection.commit()
+        print("Data inserted into the database")
 
     except Exception as e:
         print(f"Error processing message: {e}")
