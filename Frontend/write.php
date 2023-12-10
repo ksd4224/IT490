@@ -4,22 +4,28 @@ require 'vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION['first']) && isset($_SESSION['last'])) {
+if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION['first']) && isset($_SESSION['last']) && isset($_SESSION['height']) && isset($_SESSION['weight']) && isset($_SESSION['movie']) && isset($_SESSION['color'])) {
     $email = $_SESSION['email'];
     $password = $_SESSION['password'];
     $first = $_SESSION['first'];
     $last = $_SESSION['last'];
+    $height = $_SESSION['height'];
+    $weight = $_SESSION['weight'];
+    $color = $_SESSION['color'];
+    $movie = $_SESSION['movie'];
 
-    $rabbitMQHost = '10.248.179.6';
+    $rabbitMQHosts = '10.147.17.79';
     $rabbitMQPort = 5672;
     $rabbitMQUser = 'backend';
     $rabbitMQPassword = 'password';
     $virtualHost = '/';
-    $exchangeName = 'frontend-backend'; // Replace with your exchange name
-    echo $first . " " . $last . " " . $email . " " . $password;
+    $exchangeName = 'frontend-backend';
+
+    echo "name: " .$first . " " . $last . " email: " . $email . " pass: " . $password . " height: " . $height . " weight: " . $weight;
+
     try {
         // Create a connection to RabbitMQ
-        $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+        $connection = new AMQPStreamConnection($rabbitMQHosts, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
 
         // Create a channel
         $channel = $connection->channel();
@@ -29,14 +35,19 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
 
         // Create a message
         $messageBody = json_encode([
-            'first' => $first,
-            'last' => $last,
+            'first_name' => $first,
+            'last_name' => $last,
             'email' => $email,
-            'password' => $password
+            'password' => $password,
+            'height' => $height,
+            'weight' => $weight,
+            'movie' => $movie,
+            'color' => $color,
+            'goal' => 'null',
         ]);
 
         // Specify the routing key for the backend queue
-        $routingKey = 'frontend';
+        $routingKey = 'reg.request'; // frontend
 
         // Publish the message to the exchange with the routing key
         $message = new AMQPMessage($messageBody);
@@ -49,6 +60,10 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
         // Clear the session variables
         unset($_SESSION['email']);
         unset($_SESSION['password']);
+        unset($_SESSION['first']);
+        unset($_SESSION['last']);
+        unset($_SESSION['height']);
+        unset($_SESSION['weight']);
 
         echo "Message sent to the exchange with routing key '$routingKey': $messageBody\n";
     } catch (\Exception $e) {
@@ -58,3 +73,4 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
     echo "Registration did not succeed.";
 }
 ?>
+
