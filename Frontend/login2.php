@@ -5,7 +5,20 @@
         $_SESSION['email'] = $_POST['email'];
         $_SESSION['password'] = $_POST['password'];
         $email = $_SESSION['email'];
-        include 'write.php';
+        //include 'write.php';
+?>
+<?php
+        // Check if there is an error parameter indicating no success
+        if (isset($_GET['error']) && $_GET['error'] === 'no_success') {
+                echo '<script>alert("Login Unsuccessful!");</script>';
+        }
+        else if (isset($_GET['error']) && $_GET['error'] === 'timeout') {
+                echo '<script>alert("Timeout!");</script>';
+        }
+        else{
+                echo '<script>alert("Registration Successful!");</script>';
+        }
+
 ?>
 
 <html>
@@ -20,14 +33,16 @@
         <p class="mantra">SHIFT YOUR HEALTH, SHAPE YOUR FUTURE</p>
         <h1 class="register">LOGIN</h1>
     </h1>
-    <form action="test.php" method="post">
+    <form action="check2.php" method="post" style="font-size: 23px; padding-left: 385px;">
         <label for="email"><b>Email</b></label>
         <input type="text" placeholder="Enter Email" name="email" id="email" required>
         <br><br>
         <label for="password"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="password" id="password" required>
+        <br>
+        <a style="font-size: 18px" href="forgot_password.php">Forgot Password?</a>
         <br><br>
-        <button type="submit" class="registerbtn">Login</button>
+        <button type="submit" class="button1">Login</button>
     </form>
 </body>
 </html>
