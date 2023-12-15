@@ -52,7 +52,7 @@ def callback1(ch, method, properties, body):
         password = data.get('password')
         movie = data.get('movie')
         color = data.get('color')
-        print("Processing Data:", email, password)
+        print("Processing Data:", email, password, movie, color)
 
         # Publish data to forward1 database
         try:
