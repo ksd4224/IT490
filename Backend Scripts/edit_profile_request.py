@@ -48,11 +48,13 @@ def callback1(ch, method, properties, body):
     data = json.loads(body.decode('utf-8'))
     print("Received login request from front-end:", data)
     try:
+        firstname = data.get('firstname')
+        lastname = data.get('lastname')
         email = data.get('email')
         password = data.get('password')
-        movie = data.get('movie')
-        color = data.get('color')
-        print("Processing Data:", email, password)
+        height = data.get('height')
+        weight = data.get('weight')
+        print("Processing Data:", firstname, lastname, email, password, height, weight)
 
         # Publish data to forward1 database
         try:

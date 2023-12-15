@@ -49,10 +49,8 @@ def callback1(ch, method, properties, body):
     print("Received login request from front-end:", data)
     try:
         email = data.get('email')
-        password = data.get('password')
-        movie = data.get('movie')
-        color = data.get('color')
-        print("Processing Data:", email, password)
+        post = data.get('post')
+        print("Processing Data:", email, post)
 
         # Publish data to forward1 database
         try:
