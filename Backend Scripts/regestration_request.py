@@ -35,7 +35,7 @@ if not check_rabbitmq_host(primary_host):
     parameters = pika.ConnectionParameters(host=secondary_host, port=5672, credentials=credentials)
 else:
     parameters = pika.ConnectionParameters(host=primary_host, port=5672, credentials=credentials)
-
+#consume from rabbitmq
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 channel.queue_declare(queue='reg-request', durable=True)
