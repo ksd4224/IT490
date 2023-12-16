@@ -1,4 +1,3 @@
-# registration.py
 import mysql.connector
 import json
 import pika
@@ -51,12 +50,15 @@ def handle_registration(data, cursor, db_connection, channel):
     else:
         registration_sql = """
             INSERT INTO users (email, password, weight, height, goal, first_name, last_name, movie, color)
-            VALUES (%s, %s, %s, %s, '', %s, %s, '', '')
+            VALUES (%s, %s, %s, %s, '', %s, %s, %s, %s)
         """
-        cursor.execute(registration_sql, (data['email'], data['password'], data['weight'], data['height'], data['first_name'], data['last_name']))
+        cursor.execute(registration_sql, (
+            data['email'], data['password'], data['weight'], data['height'],
+            data['first_name'], data['last_name'], data['movie'], data['color']
+        ))
         db_connection.commit()
 
-        print("Registration success.")
+        print("Registration success. Data added to the database.")
         success_message = {"status": "success"}
 
         try:
@@ -77,8 +79,12 @@ if __name__ == "__main__":
     channel = connection.channel()
 
     registration_request_queue, registration_response_queue = setup_queues(channel)
-    channel.basic_consume(queue=registration_request_queue, on_message_callback=lambda ch, method, properties, body: handle_registration(json.loads(body), cursor, db_connection, channel), auto_ack=True)
+    db_connection, cursor = connect_to_database()
+    channel.basic_consume(
+        queue=registration_request_queue,
+        on_message_callback=lambda ch, method, properties, body: handle_registration(json.loads(body), cursor, db_connection, channel),
+        auto_ack=True
+    )
 
     print('Waiting for registration messages. To exit press CTRL+C')
     channel.start_consuming()
-

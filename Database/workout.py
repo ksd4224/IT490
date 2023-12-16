@@ -2,7 +2,16 @@ import os
 import pika
 import json
 import pymysql
+from datetime import datetime
+from decimal import Decimal
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        elif isinstance(o, Decimal):
+            return float(o)
+        return super(DateTimeEncoder, self).default(o)
 
 #credentials = pika.PlainCredentials('backend', 'password')
 #parameters = pika.ConnectionParameters(
@@ -13,7 +22,7 @@ import pymysql
 
 primary_host = '10.147.17.79'
 secondary_host = '10.147.17.34'
-output_file = 'goals_data.txt'  # Specify your desired file name or path here
+output_file = 'workout_data.txt'  # Specify your desired file name or path here
 
 credentials = pika.PlainCredentials('backend', 'password')
 
@@ -35,8 +44,8 @@ else:
 # Create connections and channels
 consume1_connection = pika.BlockingConnection(parameters)
 consume1_channel = consume1_connection.channel()
-consume1_channel.queue_declare(queue='back-goals-request', durable=True)
-consume1_channel.queue_bind(exchange='backend-database', queue='back-goals-request', routing_key='goals.back')
+consume1_channel.queue_declare(queue='back-workout-request', durable=True)
+consume1_channel.queue_bind(exchange='backend-database', queue='back-workout-request', routing_key='workout.back')
 
 def save_to_txt(data):
     with open(output_file, 'w') as file:
@@ -81,8 +90,8 @@ def callback_and_insert(ch, method, properties, body):
 
     try:
         email = data.get('email')
-        goal = data.get('goal')
-        print("Processing Data:", email, goal)
+        workout = data.get('workout')
+        print("Processing Data:", email, workout)
 
         # Connect to MySQL
         db_connection, cursor = get_mysql_connection()
@@ -93,10 +102,11 @@ def callback_and_insert(ch, method, properties, body):
             user = cursor.fetchone()
 
             if user:
-                update_goal_sql = "UPDATE users SET goal = %s WHERE email = %s"
-                cursor.execute(update_goal_sql, (goal, email))
+                # Insert workout information into the 'workout' table
+                insert_workout_sql = "INSERT INTO workout (user_id, workout_name) VALUES (%s, %s)"
+                cursor.execute(insert_workout_sql, (user['user_id'], workout))
                 db_connection.commit()
-                print(f"Goal for user {email} updated to {goal}")
+                print(f"Workout '{workout}' added for user {email}")
 
                 # Fetch workouts for the user
                 workouts = get_user_workouts(user['user_id'], cursor)
@@ -107,7 +117,7 @@ def callback_and_insert(ch, method, properties, body):
                 # Send success message back to the queue with user information, workouts, and user totals
                 success_message = {
                     'status': 'success',
-                    'message': f'Successfully updated goal for {email} to {goal}',
+                    'message': f'Successfully added workout "{workout}" for {email}',
                     'user_data': {
                         'email': user['email'],
                         'password': user['password'],
@@ -122,15 +132,15 @@ def callback_and_insert(ch, method, properties, body):
                 }
                 ch.basic_publish(
                     exchange='backend-database',
-                    routing_key='goals.data',
-                    body=json.dumps(success_message),
+                    routing_key='workout.data',
+                    body=json.dumps(success_message, cls=DateTimeEncoder),
                     properties=pika.BasicProperties(
                         delivery_mode=2,
                     )
                 )
 
             else:
-                print(f"User with email {email} not found in the database. Skipping goal update.")
+                print(f"User with email {email} not found in the database. Skipping workout addition.")
 
         except Exception as e:
             print(f"Error reading and updating database: {e}")
@@ -144,10 +154,10 @@ def callback_and_insert(ch, method, properties, body):
         print(f"Error processing message: {e}")
 
 if __name__ == "__main__":
-    consume1_channel.basic_consume(queue='back-goals-request', on_message_callback=callback_and_insert, auto_ack=True)
+    consume1_channel.basic_consume(queue='back-workout-request', on_message_callback=callback_and_insert, auto_ack=True)
 
     try:
-        print('Goals is [*] Waiting for messages. To exit press CTRL+C')
+        print('Workout is [*] Waiting for messages. To exit press CTRL+C')
         consume1_channel.start_consuming()
 
     except KeyboardInterrupt:
