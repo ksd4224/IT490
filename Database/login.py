@@ -2,6 +2,13 @@ import mysql.connector
 import json
 import pika
 import logging
+from datetime import datetime
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return super().default(o)
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('pika').setLevel(logging.WARNING)
@@ -57,8 +64,43 @@ def connect_to_rabbitmq():
 
 def setup_login_queue(channel):
     login_request_queue_name = 'back-login-request'
+    login_response_queue_name = 'data-login-response'
+
     channel.queue_declare(queue=login_request_queue_name, durable=True)
-    return login_request_queue_name
+    channel.queue_declare(queue=login_response_queue_name, durable=True)
+
+    return login_request_queue_name, login_response_queue_name
+
+def get_user_totals(user_id, cursor):
+    query = """
+        SELECT SUM(calories) as total_calories,
+               SUM(protein) as total_protein,
+               SUM(carbohydrates) as total_carbohydrates,
+               SUM(fat) as total_fat,
+               SUM(sugar) as total_sugar
+        FROM nutrition_data
+        JOIN meals ON nutrition_data.meal_id = meals.meal_id
+        WHERE meals.user_id = %s
+    """
+    cursor.execute(query, (user_id,))
+    result = cursor.fetchone()
+
+    if result:
+        return {
+            "total_calories": result[0] or 0,
+            "total_protein": result[1] or 0,
+            "total_carbohydrates": result[2] or 0,
+            "total_fat": result[3] or 0,
+            "total_sugar": result[4] or 0
+        }
+    else:
+        return {
+            "total_calories": 0,
+            "total_protein": 0,
+            "total_carbohydrates": 0,
+            "total_fat": 0,
+            "total_sugar": 0
+        }
 
 def handle_login(ch, method, properties, body, cursor, db_connection, channel):
     login_sql = "SELECT * FROM users WHERE email = %s AND password = %s"
@@ -79,10 +121,18 @@ def handle_login(ch, method, properties, body, cursor, db_connection, channel):
             "first_name": user[6],
             "last_name": user[7],
             "movie": user[8],
-            "color": user[9]
+            "color": user[9],
         }
 
-        # Fetch nutrition data using the correct column names and join
+        # Fetch meals
+        #meals_sql = "SELECT * FROM meals WHERE user_id = %s"
+        #cursor.execute(meals_sql, (user[0],))
+        #meals_data = cursor.fetchall()
+        #response_message["meals_data"] = [
+        #    {"meal_id": row[0], "user_id": row[1], "meal_name": row[2], "meal_datetime": row[3]} for row in meals_data
+        #]
+
+        # Fetch nutrition data
         nutrition_sql = """
             SELECT nd.*
             FROM nutrition_data nd
@@ -90,45 +140,50 @@ def handle_login(ch, method, properties, body, cursor, db_connection, channel):
             WHERE m.user_id = %s
         """
         cursor.execute(nutrition_sql, (user[0],))
-        nutrition_data = cursor.fetchone()
+        nutrition_data = cursor.fetchall()
+        response_message["nutrition_data"] = [
+            {
+                "data_id": row[0],
+                "meal_id": row[1],
+                "calories": row[2],
+                "protein": row[3],
+                "fat": row[4],
+                "carbohydrates": row[5],
+                "sugar": row[6],
+                "serving_size": row[7],
+                "servings": row[8]
+            } for row in nutrition_data
+        ]
 
-        if not nutrition_data:
-            # Insert default nutrition data if it doesn't exist
-            insert_nutrition_sql = """
-                INSERT INTO nutrition_data (meal_id, calories, protein, fat, carbohydrates, sugar, serving_size, servings)
-                VALUES ((SELECT meal_id FROM meals WHERE user_id = %s LIMIT 1), 0, 0, 0, 0, 0, 0, 0)
-            """
-            cursor.execute(insert_nutrition_sql, (user[0],))
-            db_connection.commit()
+        # Get user totals
+        user_totals = get_user_totals(user[0], cursor)
+        response_message["user_totals"] = user_totals
 
-            # Fetch the inserted nutrition data
-            cursor.execute(nutrition_sql, (user[0],))
-            nutrition_data = cursor.fetchone()
-
-        response_message["nutrition_data"] = nutrition_data
+    # Use the DateTimeEncoder when serializing the response_message to JSON
+    response_message_json = json.dumps(response_message, cls=DateTimeEncoder)
 
     # Publish the response message
     channel.basic_publish(
-        exchange='',
-        routing_key='login_response',
-        body=json.dumps(response_message),
+        exchange='backend-database',
+        routing_key='log.data',
+        body=response_message_json,
         properties=pika.BasicProperties(
             delivery_mode=2,
         )
     )
-    print("Login response sent back to the 'login_response' queue.")
+    print("Login response sent back to the 'log.data' queue.")
 
 if __name__ == "__main__":
     connection, channel = connect_to_rabbitmq()
 
     queue_name = setup_login_queue(channel)
-    logging.info(f"Declared queue: {queue_name}")
+    logging.info(f"Declared queues: {queue_name}")
 
     db_connection, cursor = connect_to_database()
 
     try:
         channel.basic_consume(
-            queue=queue_name,
+            queue=queue_name[0],
             on_message_callback=lambda ch, method, properties, body: handle_login(ch, method, properties, body, cursor, db_connection, channel),
             auto_ack=True
         )
