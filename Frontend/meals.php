@@ -3,10 +3,8 @@ session_start();
 $user_data = $_SESSION['user_data'];
 $email = $user_data['email'];
 $user_id = $user_data['user_id'];
-
-    // Now you can use $email and $user_id in your code
-    echo "Email: " . $email . "<br>";
-    echo "User ID: " . $user_id . "<br>";
+echo "Email: " . $email . "<br>";
+echo "User ID: " . $user_id . "<br>";
 if (isset($_SESSION['user_data'])) {
                 $user_data = $_SESSION['user_data'];
                 $id = $user_data['user_id'];
@@ -21,21 +19,26 @@ if (isset($_SESSION['user_data'])) {
                 // Handle the case where user data is not available
                 echo "User data not available.";
         }
-        if (isset($_SESSION['nutrition_data']) && $_SESSION['nutrition_data'] != 'None') {
-                $nutrition_data = $_SESSION['nutrition_data'];
-                $data_id = $nutrition_data['data_id'];
-                $meal_id = $nutrition_data['meal_id'];
-                $calories = $nutrition_data['calories'];
-                $protein = $nutrition_data['protein'];
-                $carbs = $nutrition_data['carbohydrates'];
-                $fat = $nutrition_data['fat'];
-                $sugar = $nutrition_data['sugar'];
-                $serving_size = $nutrition_data['serving_size'];
-                $servings = $nutrition_data['servings'];
+	if (isset($_SESSION['user_totals']) && $_SESSION['user_totals'] !== 'None') {
+                $user_totals = $_SESSION['user_totals'];
+                // Assuming there can be multiple meals/nutrition data
+                //$data_id = $user_totals['data_id'];
+                //$meal_id = $user_totals['meal_id'];
+                $calories = $user_totals['total_calories'];
+                $protein = $user_totals['total_protein'];
+                $carbs = $user_totals['total_carbohydrates'];
+                $fat = $user_totals['total_fat'];
+                $sugar = $user_totals['total_sugar'];
+                //$serving_size = $user_totals['serving_size'];
+                //$servings = $user_totals['servings'];
+
+                // Display or use the meal/nutrition data as needed
+                echo "Meal ID: " . $meal_id . ", Calories: " . $calories . ", Protein: " . $protein . ", Carbs: " . $carbs . ", Fat: " . $fat . ", Sugar: " . $sugar . ", Serving Size: " . $serving_size . ", Servings: " . $servings . "<br>";
 
         } else {
-                // Handle the case where user data is not available
-                $nutrition_data = $_SESSION['nutrition_data'];
+                // Handle the case where nutrition data is not available
+                echo "User totlas not available.";
+                //$nutrition_data = $_SESSION['nutrition_data'];
                 $data_id = 0;
                 $meal_id = 0;
                 $calories = 0;
@@ -48,7 +51,7 @@ if (isset($_SESSION['user_data'])) {
         }
 
         echo "email: " . $email . " pass: " . $password . " name: " . $first . " " . $last . " movie: " . $movie . " color: " . $color . " id: " . $id;
-
+        echo "cal: " . $calories;
 ?>
 <html>
         <head>
@@ -100,8 +103,7 @@ if (isset($_SESSION['user_data'])) {
                         <h2>ADD MEALS</h2>
                         <div class="card">
                                 <div class="card-body">
-
-                                        <form style="font-size:24px" id="nutritionForm">
+                                        <form style="font-size:24px" id="nutritionForm" action="check4.php" method="post">
                                                 <label for="foodQuery">Enter a Food Item:</label>
                                                 <input style="font-size: 20px" type="text" id="foodQuery" name="foodQuery" required>
                                                 </br> </br>
@@ -118,7 +120,7 @@ if (isset($_SESSION['user_data'])) {
                                         </form>
 
                                         <div id="result"></div>
-                                        <button class="button1" type="button" id="addMealButton" style="display: none;" onclick="sendDataToWritePHP()">Add Meal </button>
+                                        <button class="button1" type="button" id="addMealButton" style="display: none;" onclick="sendDataToCheck4PHP()">Add Meal </button>
                                         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
                                                 <!-- ... Your HTML code ... -->
@@ -143,7 +145,7 @@ if (isset($_SESSION['user_data'])) {
             }
         });
     }
-    var adjustedCalories, adjustedProtein, adjustedCarbohydrates, adjustedFat, adjustedSugarm, name, servingSize, servings;
+    var adjustedCalories, adjustedProtein, adjustedCarbohydrates, adjustedFat, adjustedSugar, name, servingSize, servings;
     function displayNutritionData(data) {
         var resultContainer = document.getElementById("result");
 
@@ -191,63 +193,45 @@ if (isset($_SESSION['user_data'])) {
         }
     }
 
+    function sendDataToCheck4PHP() {
+        // Get the adjusted nutrition values
+        var form = document.getElementById("nutritionForm");
 
-    function sendDataToWritePHP() {
-    // Get the adjusted nutrition values
-    sessionStorage.setItem('mealName', name);
-    sessionStorage.setItem('mealCalories', adjustedCalories);
-    sessionStorage.setItem('mealProtein', adjustedProtein);
-    sessionStorage.setItem('mealCarbohydrates', adjustedCarbohydrates);
-    sessionStorage.setItem('mealFat', adjustedFat);
-    sessionStorage.setItem('mealSugar', adjustedSugar);
-    sessionStorage.setItem('mealServingSize', servingSize);
-    sessionStorage.setItem('mealServings', servings);
+        // Add hidden input fields to the form
+        var hiddenFields = [
+            { name: 'mealName', value: name },
+            { name: 'mealCalories', value: adjustedCalories },
+            { name: 'mealProtein', value: adjustedProtein },
+            { name: 'mealCarbohydrates', value: adjustedCarbohydrates },
+            { name: 'mealFat', value: adjustedFat },
+            { name: 'mealSugar', value: adjustedSugar },
+            { name: 'mealServingSize', value: servingSize },
+	    { name: 'mealServings', value: servings },
+	    { name: 'mealDateTime', value: getCurrentDateTime() }, // Add this line to set the mealDateTime
+        ];
 
-    var mealDateTime = new Date().toISOString();
-    sessionStorage.setItem('mealDateTime', mealDateTime);
-    console.log("DateTime: " + mealDateTime);
-    console.log("Name: " + name);
-    console.log("Calories: " + adjustedCalories);
-        
+        hiddenFields.forEach(function (field) {
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = field.name;
+            input.value = field.value;
+            form.appendChild(input);
+        });
 
-    // Use AJAX to send data to check4.php
-    $.ajax({
-        type: 'POST',
-        url: 'check4.php',
-        data: {
-            mealName: name,
-            mealCalories: adjustedCalories,
-            mealProtein: adjustedProtein,
-            mealCarbohydrates: adjustedCarbohydrates,
-            mealFat: adjustedFat,
-            mealSugar: adjustedSugar,
-            mealServingSize: servingSize,
-            mealServings: servings,
-            mealDateTime: mealDateTime,
-        },
-        success: function(response) {
-            // Handle the response from the server if needed
-                // Extract script content from the response
-                console.log("AJAX Response: " + response);
-                //var scriptContent = $(response).filter('script').text();
-
-                // Execute the extracted script
-                //if (scriptContent.trim() !== '') {
-        //              var script = new Function(response);
-        //              script();
-                //}
-                // Replace '#result-container' with the appropriate selector for your use case
-                //$('#result-container').html(response);
-                window.location.href = 'test.php?meal=success';
-        },
-        error: function(jqXHR, textStatus, errorThrown, response) {
-            console.log("AJAX Response: " + response);
-            console.error('AJAX Error:', textStatus, errorThrown);
-            window.location.href = 'test.php?meal=success';
-        }
-    });
+        // Submit the form
+        form.submit();
     }
+    function getCurrentDateTime() {
+    	var now = new Date();
+    	var year = now.getFullYear();
+    	var month = (now.getMonth() + 1).toString().padStart(2, '0');
+    	var day = now.getDate().toString().padStart(2, '0');
+    	var hours = now.getHours().toString().padStart(2, '0');
+    	var minutes = now.getMinutes().toString().padStart(2, '0');
+    	var seconds = now.getSeconds().toString().padStart(2, '0');
 
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
     function adjustServings(change) {
         // Adjust the number of servings based on the change (1 for increase, -1 for decrease)
         var servingsInput = document.getElementById("servings");
@@ -267,12 +251,8 @@ if (isset($_SESSION['user_data'])) {
         resultContainer.innerHTML = `<p style="color: red;">${message}</p>`;
     }
 </script>
-<!-- ... The rest of your HTML code ... -->
-
-
                                 </div>
                         </div>
                 </div>
         </body>
 </html>
-
