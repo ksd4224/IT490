@@ -145,7 +145,6 @@ if (isset($_SESSION['meals_data'])) {
                                 </button>
                                 <div class="dropdown-content">
                                         <a href="forum.php">Community Forum</a>
-                                        <a href="friends.php">Friends</a>
                                 </div>
 			</div>
 			<a href="aboutus.php">About Us</a>
