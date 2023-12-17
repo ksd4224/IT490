@@ -14,7 +14,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
     $color = $_SESSION['color'];
     $movie = $_SESSION['movie'];
 
-    $rabbitMQHosts = '10.147.17.79';
+    $rabbitMQHosts = ['10.147.17.34', '10.147.17.79', '10.147.17.44'];
     $rabbitMQPort = 5672;
     $rabbitMQUser = 'backend';
     $rabbitMQPassword = 'password';
@@ -25,7 +25,18 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
 
     try {
         // Create a connection to RabbitMQ
-        $connection = new AMQPStreamConnection($rabbitMQHosts, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+        foreach ($rabbitMQHosts as $rabbitMQHost) {
+                try {
+                        // Create a connection to RabbitMQ
+                        $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+
+                        // Connection successful, break out of the loop
+                        break;
+                } catch (\Exception $e) {
+                        // Connection failed, try the next IP address
+                        echo "Failed to connect to RabbitMQ at $rabbitMQHost: " . $e->getMessage() . "\n";
+                }
+        }
 
         // Create a channel
         $channel = $connection->channel();
@@ -42,8 +53,8 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
             'height' => $height,
             'weight' => $weight,
             'movie' => $movie,
-            'color' => $color,
-            'goal' => 'null',
+	    'color' => $color,
+	    'goal' => 'null',
         ]);
 
         // Specify the routing key for the backend queue
@@ -73,4 +84,3 @@ if (isset($_SESSION['email']) && isset($_SESSION['password']) && isset($_SESSION
     echo "Registration did not succeed.";
 }
 ?>
-
