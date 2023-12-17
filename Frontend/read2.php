@@ -6,18 +6,29 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 session_start();
 
 // RabbitMQ server connection parameters
-$rabbitMQHost = '10.147.17.79'; // Change this to your RabbitMQ server IP address
+$rabbitMQHosts = ['10.147.17.34', '10.147.17.79', '10.147.17.44'];
 $rabbitMQPort = 5672; // Default RabbitMQ port
 $rabbitMQUser = 'backend';
 $rabbitMQPassword = 'password';
 $virtualHost = '/';
 
 // Queue name (frontend-to-backend-queue)
-$queueName = 'back-front'; // Replace with the actual queue name
+$queueName = 'front-login-response'; //back-front
 
 try {
     // Create a connection to RabbitMQ
-    $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+        foreach ($rabbitMQHosts as $rabbitMQHost) {
+                try {
+                        // Create a connection to RabbitMQ
+                        $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+
+                        // Connection successful, break out of the loop
+                        break;
+                } catch (\Exception $e) {
+                        // Connection failed, try the next IP address
+                        echo "Failed to connect to RabbitMQ at $rabbitMQHost: " . $e->getMessage() . "\n";
+                }
+        }
 
     // Create a channel
     $channel = $connection->channel();
@@ -31,21 +42,34 @@ try {
     $timeout = 60;
     $start_time = time();
 
-    // Callback function to process received messages
     $callback = function ($message) {
         // Store the received message in the session
         $_SESSION['received_message'] = $message->body;
 
         echo 'Received: ', $message->body, "\n";
 
-        // Check if the first word of the received message is 'success'
-        $messageWords = explode(' ', $message->body);
-        if (!empty($messageWords) && $messageWords[0] === 'Success') {
-            // Redirect the user to the home screen or any desired location
-            header("Location: test.php");
-            exit(); // Ensure script termination after the header redirection
+        $decodedMessage = json_decode($message->body, true);
+
+        if ($decodedMessage !== null) {
+        // Check if the 'status' field is 'success'
+                if (isset($decodedMessage['status']) && $decodedMessage['status'] === 'success') {
+                        // Redirect the user to the home screen or any desired location
+			$_SESSION['user_data'] = $decodedMessage['user_data'];
+			$_SESSION['user_totals'] = $decodedMessage['user_totals'];
+			echo "in here";
+			header("Location: test.php?success=true");
+                        exit(); // Ensure script termination after the header redirection
+                } else {
+                        header("Location: login2.php?error=no_success");
+                        exit();
+                }
+        } else {
+                // Handle JSON decoding error (invalid JSON format)
+                header("Location: login2.php?error=json_decode_error");
+                exit();
         }
     };
+
 
     // Consume messages from the queue
     $channel->basic_consume($queueName, '', false, true, false, false, $callback);
@@ -67,5 +91,4 @@ try {
 } catch (\Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
 }
-
-
+?>
