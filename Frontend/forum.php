@@ -40,7 +40,7 @@
                                 <div class="dropdown-content">
                                         <a href="profile.php">Edit profile</a>
                                         <a href="goals.php">Edit Goals</a>
-					<a href="trend.php">Trend</a>
+					<a href="trend.php">7-day Trend</a>
 					<a href="meals.php">Add Meals</a>
                                         <a href="workout.php">Add Workout</a>
                                         <a href="add_weight.php">Add Weight</a>
@@ -51,7 +51,6 @@
                                 </button>
                                 <div class="dropdown-content">
                                         <a href="forum.php">Community Forum</a>
-                                        <a href="friends.php">Friends</a>
                                 </div>
                         </div>
                         <a href="aboutus.php">About Us</a>
