@@ -1,40 +1,11 @@
 <?php
-session_start();
-
-// Check if the user is logged in
-//if (!isset($_SESSION['email'])) {
-//    header('Location: login2.php'); // Redirect to the login page if not logged in
-//    exit();
-//}
-
-// Sample user data (replace with actual database retrieval)
-$userData = [
-    'email' => $_SESSION['email'],
-    'firstName' => 'John',
-    'lastName' => 'Doe',
-    'password' => 'hashed_password', // Replace with actual hashed password
-    'height' => '5ft 6in',
-    'weight' => '140 lbs',
-];
-
-// Check if the form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Process form data and update the user profile (replace with actual database update)
-
-    // Sample update for first name, last name, password, and height
-    $newFirstName = $_POST['firstName'];
-    $newLastName = $_POST['lastName'];
-    $newPassword = $_POST['password']; // Hash the new password
-    $newHeight = $_POST['height'];
-
-    // Update the user data in the database (replace with actual update query)
-    // write.php
-    echo $newFirstName . " " . $newLastName;
-
-    // Redirect to the profile page after updating
-    //header('Location: profile.php');
-    exit();
-}
+        session_start();
+        $user_data = $_SESSION['user_data'];
+        $email = $user_data['email'];
+        $height = $user_data['height'];
+        $weight = $user_data['weight'];
+        $first = $user_data['first_name'];
+        $last = $user_data['last_name'];
 ?>
 
 <html>
@@ -50,3 +21,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <img class="img3" src="logout.png" style="width:5%; padding-right: 1%">
                         </a>
                         SHAPESHIFT: EDIT PROFILE <br>
+                        <p class="mantra">SHIFT YOUR HEALTH, SHAPE YOUR FUTURE</p>
+                        <div align="right" style="font-size:20px; font-style:normal;padding-right: 40px;">
+                                Logout
+                        </div>
+                </h1>
+                <div class="navbar">
+                        <a href="test.php">Home</a>
+                        <div class="dropdown">
+                                <button class="dropbtn"> Profile &#8609;
+                                </button>
+                                <div class="dropdown-content">
+                                        <a href="profile.php">Edit profile</a>
+                                        <a href="goals.php">Edit Goals</a>
+                                        <a href="trend.php">7-day Trend</a>
+                                        <a href="meals.php">Add Meals</a>
+                                        <a href="workout.php">Add Workout</a>
+                                        <a href="add_weight.php">Add Weight</a>
+                                </div>
+                        </div>
+                        <div class="dropdown">
+                                <button class="dropbtn"> Community &#8609;
+                                </button>
+                                <div class="dropdown-content">
+                                        <a href="forum.php">Community Forum</a>
+                                        <a href="friends.php">Friends</a>
+                                </div>
+                        </div>
+                        <a href="aboutus.php">About Us</a>
+                </div>
+                <div class="main" style="margin-left: 0px;width: 99%;">
+                        <h2>EDIT PROFILE</h2>
+                        <div class="card">
+                                <div class="card-body">
+                                        <form method="post" action="check8.php">
+                                                <label for="email">Email Address:</label>
+                                                <input type="text" id="email" name="email" value="<?php echo $email ?>" readonly>
+                                                </br></br>
+
+                                                <label for="firstName">First Name:</label>
+                                                <input type="text" id="firstName" name="firstName" value="<?php echo $first ?>">
+                                                </br></br>
+
+                                                <label for="lastName">Last Name:</label>
+                                                <input type="text" id="lastName" name="lastName" value="<?php echo $last ?>">
+                                                </br></br>
+
+                                                <label for="height">Height:</label>
+                                                <input type="text" id="height" name="height" value="<?php echo $height ?>"> in
+                                                </br></br>
+
+                                                <label for="weight">Weight:</label>
+                                                <input type="text" id="weight" name="weight" value="<?php echo $weight ?>"> lbs
+                                                </br></br>
+
+                                                <button class="button1" type="submit">Save Changes</button>
+                                        </form>
+                                </div>
+                        </div>
+                </div>
+        </body>
+</html>
