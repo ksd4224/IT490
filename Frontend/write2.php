@@ -12,7 +12,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['password'])) {
     //use PhpAmqpLib\Connection\AMQPStreamConnection;
     //use PhpAmqpLib\Message\AMQPMessage;
 
-    $rabbitMQHost = '10.248.179.6';
+    $rabbitMQHosts = ['10.147.17.34', '10.147.17.79', '10.147.17.44'];
     $rabbitMQPort = 5672;
     $rabbitMQUser = 'backend';
     $rabbitMQPassword = 'password';
@@ -21,7 +21,19 @@ if (isset($_SESSION['email']) && isset($_SESSION['password'])) {
     echo $email . " " . $password;
     try {
         // Create a connection to RabbitMQ
-        $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+        foreach ($rabbitMQHosts as $rabbitMQHost) {
+                try {
+                        // Create a connection to RabbitMQ
+                        $connection = new AMQPStreamConnection($rabbitMQHost, $rabbitMQPort, $rabbitMQUser, $rabbitMQPassword, $virtualHost);
+
+                        // Connection successful, break out of the loop
+                        break;
+                } catch (\Exception $e) {
+                        // Connection failed, try the next IP address
+                        echo "Failed to connect to RabbitMQ at $rabbitMQHost: " . $e->getMessage() . "\n";
+		}
+		echo "hhh: " . $rabbitMQHost;
+        }
 
         // Create a channel
         $channel = $connection->channel();
@@ -36,7 +48,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['password'])) {
         ]);
 
         // Specify the routing key for the backend queue
-        $routingKey = 'login';
+        $routingKey = 'log.request'; //login
 
         // Publish the message to the exchange with the routing key
         $message = new AMQPMessage($messageBody);
@@ -58,4 +70,3 @@ if (isset($_SESSION['email']) && isset($_SESSION['password'])) {
     echo "Email and password not found in the session.";
 }
 ?>
-
