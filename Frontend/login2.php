@@ -8,14 +8,20 @@
         //include 'write.php';
 ?>
 <?php
-        // Check if there is an error parameter indicating no success
-        if (isset($_GET['error']) && $_GET['error'] === 'no_success') {
-                echo '<script>alert("Login Unsuccessful!");</script>';
-        }
-        else if (isset($_GET['error']) && $_GET['error'] === 'timeout') {
+	// Check if there is an error parameter indicating no success
+	if (isset($_GET['error']) && $_GET['error'] === 'no_success') {
+    		echo '<script>alert("Login Unsuccessful!");</script>';
+	}
+	else if (isset($_GET['error']) && $_GET['error'] === 'timeout') {
                 echo '<script>alert("Timeout!");</script>';
+	}
+	else if (isset($_GET['pass_error']) && $_GET['pass_error'] === 'no_success') {
+                echo '<script>alert("Could not reset password!");</script>';
+	}
+	else if (isset($_GET['pass']) && $_GET['pass'] === 'success') {
+                echo '<script>alert("Password successfully reset!");</script>';
         }
-        else{
+	else if(isset($_GET['success']) && $_GET['success'] === 'true'){
                 echo '<script>alert("Registration Successful!");</script>';
         }
 
@@ -39,9 +45,9 @@
         <br><br>
         <label for="password"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="password" id="password" required>
-        <br>
-        <a style="font-size: 18px" href="forgot_password.php">Forgot Password?</a>
-        <br><br>
+	<br>
+	<a style="font-size: 18px" href="forgot_password.php">Forgot Password?</a>
+	<br><br>
         <button type="submit" class="button1">Login</button>
     </form>
 </body>
