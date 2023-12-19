@@ -27,7 +27,7 @@ def check_rabbitmq_host(host):
         return False
 
 if not check_rabbitmq_host(primary_host):
-    print(f"Primary host {primary_host} is not running RabbitMQ. Setting secondary host {secondary_host>
+    print(f"Primary host {primary_host} is not running RabbitMQ. Setting secondary host {secondary_host}")
     parameters = pika.ConnectionParameters(host=secondary_host, port=5672, credentials=credentials)
 else:
     parameters = pika.ConnectionParameters(host=primary_host, port=5672, credentials=credentials)
@@ -36,12 +36,12 @@ else:
 consume1_connection = pika.BlockingConnection(parameters)
 consume1_channel = consume1_connection.channel()
 consume1_channel.queue_declare(queue='front-trend-request', durable=True)
-consume1_channel.queue_bind(exchange='frontend-backend', queue='front-trend-request', routing_key='trend.request'>
+consume1_channel.queue_bind(exchange='frontend-backend', queue='front-trend-request', routing_key='trend.request')
 
 forward1_connection = pika.BlockingConnection(parameters)
 forward1_channel = forward1_connection.channel()
 forward1_channel.queue_declare(queue='back-trend-request', durable=True)
-forward1_channel.queue_bind(exchange='backend-database', queue='back-trend-request', routing_key='trend.back'>
+forward1_channel.queue_bind(exchange='backend-database', queue='back-trend-request', routing_key='trend.back')
 
 
 def callback1(ch, method, properties, body):
@@ -65,7 +65,7 @@ def callback1(ch, method, properties, body):
     except Exception as e:
         print(f"Error processing message: {e}")
 
-consume1_channel.basic_consume(queue='front-trend-request', on_message_callback=callback1, auto_ack=Tru>
+consume1_channel.basic_consume(queue='front-trend-request', on_message_callback=callback1, auto_ack=True)
 
 try:
     print('Login is [*] Waiting for messages. To exit press CTRL+C')

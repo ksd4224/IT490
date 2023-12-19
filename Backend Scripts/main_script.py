@@ -23,7 +23,8 @@ workout_request_path = "/home/adam/Projects/Project490/workout/workout_request.p
 workout_response_path = "/home/adam/Projects/Project490/workout/workout_response.py"
 forum_request_path = "/home/adam/Projects/Project490/forum/forum_request.py"
 forum_response_path = "/home/adam/Projects/Project490/forum/forum_response.py"
-
+trend_request_path = "/home/adam/Projects/Project490/trends/trend_request.py"
+trend_response_path = "/home/adam/Projects/Project490/trends/trend_response.py"
 def run_script(script_path):
     try:
         subprocess.Popen(["/snap/core22/864/usr/bin/python3", script_path])
@@ -54,8 +55,10 @@ if __name__ == "__main__":
             run_script(workout_response_path)
             run_script(forum_request_path)
             run_script(forum_response_path)
+            run_script(trend_request_path)
+            run_script(trend_response_path)
 
-            time.sleep(60)
+            time.sleep(47)
         except KeyboardInterrupt:
              print("\nstopping main script.")
              break
