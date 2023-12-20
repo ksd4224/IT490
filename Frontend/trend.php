@@ -1,8 +1,8 @@
 <?php
         session_start();
         $user_data = $_SESSION['user_data'];
-        echo "Workouts data in session: ";
-print_r($_SESSION['received_message']);
+    //    echo "Workouts data in session: ";
+//print_r($_SESSION['received_message']);
 $jsonResponse = $_SESSION['received_message'];
 $data = json_decode($jsonResponse, true);
 
@@ -12,9 +12,9 @@ $mealsData = $data['meals_data'];
 // Now $mealsData is an array containing meals information
 // You can loop through it or access specific elements
 foreach ($mealsData as $meal) {
-    echo "Meal ID: " . $meal['meal_id'] . "<br>";
-    echo "Meal Name: " . $meal['meal_name'] . "<br>";
-    echo "Meal Datetime: " . $meal['meal_datetime'] . "<br>";
+//    echo "Meal ID: " . $meal['meal_id'] . "<br>";
+//    echo "Meal Name: " . $meal['meal_name'] . "<br>";
+//    echo "Meal Datetime: " . $meal['meal_datetime'] . "<br>";
     // Add more fields as needed
 }
 $workoutsData = $data['workouts'];
@@ -22,9 +22,9 @@ $workoutsData = $data['workouts'];
 // Now $workoutsData is an array containing workout information
 // You can loop through it or access specific elements
 foreach ($workoutsData as $workout) {
-    echo "Workout ID: " . $workout['workout_id'] . "<br>";
-    echo "Workout Name: " . $workout['workout_name'] . "<br>";
-    echo "Created At: " . $workout['created_at'] . "<br>";
+//    echo "Workout ID: " . $workout['workout_id'] . "<br>";
+//    echo "Workout Name: " . $workout['workout_name'] . "<br>";
+//    echo "Created At: " . $workout['created_at'] . "<br>";
     // Add more fields as needed
 }
 
@@ -34,9 +34,9 @@ $nutritionData = $data['nutrition_data'];
 // Now $nutritionData is an array containing nutrition information
 // You can loop through it or access specific elements
 foreach ($nutritionData as $nutrition) {
-    echo "Data ID: " . $nutrition['data_id'] . "<br>";
-    echo "Meal ID: " . $nutrition['meal_id'] . "<br>";
-    echo "Calories: " . $nutrition['calories'] . "<br>";
+//    echo "Data ID: " . $nutrition['data_id'] . "<br>";
+//    echo "Meal ID: " . $nutrition['meal_id'] . "<br>";
+//    echo "Calories: " . $nutrition['calories'] . "<br>";
     // Add more fields as needed
 }
 
@@ -76,7 +76,7 @@ foreach ($nutritionData as $nutrition) {
 			echo "<tr>";
 			$formattedDate = date('Y-m-d', strtotime($workout['created_at']));
                 	echo "<td>{$formattedDate}</td>";
-                	echo "<td>{$workout['workout_name']}</td>";
+                	echo "<td>{$workout[2]}</td>";
                 	echo "</tr>";
         	}
 	}
@@ -84,7 +84,7 @@ foreach ($nutritionData as $nutrition) {
 <script>
 function redirectToCheck10() {
     // Use window.location.href to redirect to the desired page
-    window.location.href = 'check10.php';
+    window.location.href = 'trend.php';
 }
 </script>
 <html>
