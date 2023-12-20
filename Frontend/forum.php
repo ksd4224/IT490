@@ -3,16 +3,12 @@
 	$user_data = $_SESSION['user_data'];
 	$email = $user_data['email'];
 	$first_name = $user_data['first_name'];
+	$jsonResponse = $_SESSION['received_message'];
+	//print_r($jsonResponse);
+	$data = json_decode($jsonResponse, true);
+	$posts = $data['all_posts'];
+	//print_r($posts);
 
-	
-	// Assuming the response from check9.php is stored in $_SESSION['forum_response']
-	$forum_response = $_SESSION['forum_response'];
-	$all_posts = [];
-
-	// Check if 'all_posts' is set in the forum response
-	if (isset($forum_response['all_posts'])) {
-    		$all_posts = $forum_response['all_posts'];
-	}
 ?>
 <html>
         <head>
@@ -61,16 +57,17 @@
         			<!-- Post Form -->
         			<form action="check9.php" method="post">
             				<textarea name="postContent" placeholder="What's on your mind?"></textarea>
-            				<button type="submit">Post</button>
+            				<button class="button1" type="submit">Post</button>
         			</form>
 				<!-- Display Posts -->
-				<?php 
-				foreach ($all_posts as $post) {
-                                        echo '<div class="post">';
-                                        echo '<strong>' . ($post['first_name'] ?? $first_name) . '</strong>';
-                                        echo '<p>' . $post['post_content'] . '</p>';
-                                        echo '</div>';
-                                } 
+				<?php
+					foreach ($posts as $post){
+    						echo '<div class="post">';
+	    					echo '<strong>' . $user_data['first_name'] . '</strong>';
+    						echo '<p>' ;
+    						echo $post['post_content'] . '</p>';
+    						echo '</div>';
+					} 
 				?>
 
 				<?php
@@ -88,21 +85,33 @@
 				?>
 			</div>
 
-			<div class="sidebar">
-        			<h2>Friends</h2>
-        			<!-- Display Friends -->
-        			<?php
-					// Fetch and display friends from the database
-					// Replace this with actual database queries
-					$friends = ['Friend 1', 'Friend 2', 'Friend 3', 'Friend 4'];
-
-					echo '<ul>';
-					foreach ($friends as $friend) {
-				    		echo '<li>' . $friend . '</li>';
-					}
-					echo '</ul>';
-				?>
-
+			<div class="sidebar" style="font-size: 20px;">
+				<b><p style="font-size: 24px"> Engaging with others on Shapeshift is beneficial for: </p></b>
+				
+				<b> Motivation: </b>
+        			Shared fitness journeys inspire commitment and motivation.
+				</br>
+    				 <b> Learning: </b>
+        			 Exchanging experiences offers valuable insights into workouts and nutrition.
+				</br>
+				<b> Accountability: </b>
+        			Community support fosters goal-setting and accountability.
+				</br>
+    				<b> Knowledge Exchange: </b>
+        			Sharing tips and advice enhances overall well-being.
+				</br>
+    				<b> Celebrating Achievements: </b>
+        			Acknowledging successes creates a positive and supportive atmosphere.
+				</br>
+    				<b> Social Connection: </b>
+        			Reduces feelings of isolation and provides a sense of belonging.
+				</br>
+    				<b> Problem Solving: </b>
+        			Community helps overcome challenges through shared experiences.
+				</br>
+    				<b> Diverse Perspectives: </b>
+        			Varied backgrounds bring diverse insights and approaches.
+			
 			</div>
 		</div>
 	</body>
