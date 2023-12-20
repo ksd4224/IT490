@@ -84,7 +84,7 @@ foreach ($nutritionData as $nutrition) {
 <script>
 function redirectToCheck10() {
     // Use window.location.href to redirect to the desired page
-    window.location.href = 'trend.php';
+    window.location.href = 'trend.php';  //normally go to check9.php
 }
 </script>
 <html>
